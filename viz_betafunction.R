@@ -7,25 +7,19 @@ for(i in 1:nrow(mt)){
 }
 
 x = distances
-beta = .0
-weights <- exp(-beta*x)/sum(exp(-beta*x))
 
-n = 100
 
-x1 <- rbeta(n, 15, 1)
-x2 <- rexp(n, rate = .1)
-x3 <- rbeta(n, 1, 10)
-y <- 80*x1 + x2 + 300*(x3) + (rbeta(n, .5, .5) -.5) * 60
-data <- data.frame(y = y, x1 = x1, x2 = x2, x3 = x3)
-shapiro.test(y)
-a <- lm("y ~ x1 + x2 + x3", data=data)
-a
-#plot(y)
-#lines(a$fitted.values)
-# err <- runif(n, -3, 3)^3
-# err2 <- runif(n, -27, 27)
-# par(mfrow=c(1,2))
-# hist(err)
-# hist(err2)
-# shapiro.test(err)
-par(mfrow = c(1,1))
+beta <- data.frame(d = x, beta_0 = exp(-0*x)/sum(exp(-0*x)),
+beta_1 = exp(-1*x)/sum(exp(-1*x)),
+beta_3 = exp(-3*x)/sum(exp(-3*x)),
+beta_5 = exp(-5*x)/sum(exp(-5*x)),
+beta_7 = exp(-7*x)/sum(exp(-7*x)),
+beta_10 = exp(-10*x)/sum(exp(-10*x))) #%>%
+
+beta %>% reshape2::melt(id = c("d"),
+                        variable.name = "Beta", 
+                        value.name = "Peso") %>%
+  ggplot(aes(x = d, y = Peso, color = Beta)) +
+  geom_line() +
+  scale_color_brewer(palette = "Set1", direction = -1) +
+  theme_bw()

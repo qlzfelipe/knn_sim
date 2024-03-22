@@ -63,7 +63,6 @@ weighted.mean <- function(x, distances, beta, ...){
 knn_custom <- function(train, 
                        validation,
                        training_target,
-                       validation_target,
                        K,
                        loss_function = quadratic_loss,
                        function_calc = mean,
@@ -95,8 +94,6 @@ knn_custom <- function(train,
     }
     validation_target_predict <- tail(it_target, nrow(validation))
     it_train <- rbind(train, validation)
-    loss_value <- do.call(loss_function, list(validation_target, 
-                                              validation_target_predict))
   }else if(task == "regression"){
     for(i in 1:nrow(it_validation)){
       distances <- sapply(X = 1:nrow(it_train), function(x){
@@ -115,13 +112,6 @@ knn_custom <- function(train,
     }
     validation_target_predict <- tail(it_target, nrow(validation))
     it_train <- rbind(train, validation)
-    
-    norm_validation_target <- (validation_target - min(validation_target))/
-      (max(validation_target) - min(validation_target))
-    norm_validation_predict <- (validation_target_predict - min(validation_target_predict))/
-      (max(validation_target_predict) - min(validation_target_predict))
-    loss_value <- do.call(loss_function, list(actual = norm_validation_target, 
-                                              predicted = norm_validation_predict))
   }
   if(!hasArg(beta)){
     beta = NULL
@@ -129,7 +119,6 @@ knn_custom <- function(train,
   return(list("predictors" = it_train, 
               "target" = it_target, 
               "predictions" = validation_target_predict,
-              "loss_value" = loss_value,
               "parameters" = list(K = K, 
                                   beta = beta,
                                   loss_function = loss_function)))
@@ -164,5 +153,3 @@ knn_cv <- function(data, error_measure = Metrics::rmse, ...){
   })
   return(mean(metrics))
 }
-
-knn_cv(train, Kfolds = 5, K = 5)
